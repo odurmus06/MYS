@@ -1,0 +1,13 @@
+C:\Users\devel\source\repos\MYS\MYSClient\obj\Debug\MYSClient.csproj.AssemblyReference.cache
+C:\Users\devel\source\repos\MYS\MYSClient\obj\Debug\MYSClient.MainForm.resources
+C:\Users\devel\source\repos\MYS\MYSClient\obj\Debug\MYSClient.Properties.Resources.resources
+C:\Users\devel\source\repos\MYS\MYSClient\obj\Debug\MYSClient.csproj.GenerateResource.cache
+C:\Users\devel\source\repos\MYS\MYSClient\obj\Debug\MYSClient.csproj.CoreCompileInputs.cache
+C:\Users\devel\source\repos\MYS\MYSClient\bin\Debug\MYSClient.exe.config
+C:\Users\devel\source\repos\MYS\MYSClient\bin\Debug\MYSClient.exe
+C:\Users\devel\source\repos\MYS\MYSClient\bin\Debug\MYSClient.pdb
+C:\Users\devel\source\repos\MYS\MYSClient\bin\Debug\MaterialSkin.dll
+C:\Users\devel\source\repos\MYS\MYSClient\bin\Debug\MaterialSkin.pdb
+C:\Users\devel\source\repos\MYS\MYSClient\obj\Debug\MYSClient.csproj.Up2Date
+C:\Users\devel\source\repos\MYS\MYSClient\obj\Debug\MYSClient.exe
+C:\Users\devel\source\repos\MYS\MYSClient\obj\Debug\MYSClient.pdb

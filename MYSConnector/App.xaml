@@ -1,0 +1,162 @@
+<Application x:Class="MYSConnector.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <ResourceDictionary>
+            <!-- Application colors -->
+            <Color x:Key="ThemeBgDeepColor">#F5F6FA</Color>
+            <Color x:Key="ThemeBgCardColor">#FFFFFF</Color>
+            <Color x:Key="ThemeBgPanelColor">#EEF0F4</Color>
+            <Color x:Key="ThemeBgInputColor">#F0F1F5</Color>
+            <Color x:Key="ThemeBgSettingsColor">#E8EAF0</Color>
+            <Color x:Key="ThemeBgItemHoverColor">#E3E6ED</Color>
+            <Color x:Key="ThemeBgItemSelectedColor">#D0D4E0</Color>
+            <Color x:Key="ThemeBgBadgeColor">#E0E2EA</Color>
+            <Color x:Key="ThemeBgStatusBarColor">#DCDFE8</Color>
+            <Color x:Key="ThemeBgColumnHeaderColor">#F0F1F5</Color>
+            <Color x:Key="ThemeBgAlertRowBorder">#D5D8E0</Color>
+
+            <Color x:Key="ThemeHeaderGrad1">#FFFFFF</Color>
+            <Color x:Key="ThemeHeaderGrad2">#F0F2F8</Color>
+            <Color x:Key="ThemeHeaderGrad3">#E0E4F0</Color>
+
+            <Color x:Key="ThemeAccentPrimary">#3B82F6</Color>
+            <Color x:Key="ThemeAccentSecondary">#8B5CF6</Color>
+            <Color x:Key="ThemeAccentGreen">#10B981</Color>
+            <Color x:Key="ThemeAccentGreenDark">#059669</Color>
+            <Color x:Key="ThemeAccentRed">#EF4444</Color>
+            <Color x:Key="ThemeAccentRedDark">#DC2626</Color>
+
+            <Color x:Key="ThemeIconGrad1">#3B82F6</Color>
+            <Color x:Key="ThemeIconGrad2">#8B5CF6</Color>
+
+            <Color x:Key="ThemeTextPrimary">#1E293B</Color>
+            <Color x:Key="ThemeTextMuted">#64748B</Color>
+            <Color x:Key="ThemeTextFooter">#94A3B8</Color>
+            <Color x:Key="ThemeBorderGlass">#CBD5E1</Color>
+
+            <Color x:Key="ThemeDataFR">#EF4444</Color>
+            <Color x:Key="ThemeDataPrice">#10B981</Color>
+            <Color x:Key="ThemeDataDot">#10B981</Color>
+            <Color x:Key="ThemeGlowColor">#3B82F6</Color>
+            <Color x:Key="ThemeHeaderGlow">#3B82F6</Color>
+
+            <!-- Application brushes -->
+            <SolidColorBrush x:Key="ThemeBgDeep" Color="{StaticResource ThemeBgDeepColor}"/>
+            <SolidColorBrush x:Key="ThemeBgCard" Color="{StaticResource ThemeBgCardColor}"/>
+            <SolidColorBrush x:Key="ThemeBgPanel" Color="{StaticResource ThemeBgPanelColor}"/>
+            <SolidColorBrush x:Key="ThemeBgInput" Color="{StaticResource ThemeBgInputColor}"/>
+            <SolidColorBrush x:Key="ThemeBgSettings" Color="{StaticResource ThemeBgSettingsColor}"/>
+            <SolidColorBrush x:Key="ThemeBgBadge" Color="{StaticResource ThemeBgBadgeColor}"/>
+            <SolidColorBrush x:Key="ThemeBgStatusBar" Color="{StaticResource ThemeBgStatusBarColor}"/>
+            <SolidColorBrush x:Key="ThemeBgColumnHeader" Color="{StaticResource ThemeBgColumnHeaderColor}"/>
+            <SolidColorBrush x:Key="ThemeTextPrimaryBrush" Color="{StaticResource ThemeTextPrimary}"/>
+            <SolidColorBrush x:Key="ThemeTextMutedBrush" Color="{StaticResource ThemeTextMuted}"/>
+            <SolidColorBrush x:Key="ThemeTextFooterBrush" Color="{StaticResource ThemeTextFooter}"/>
+            <SolidColorBrush x:Key="ThemeBorderGlassBrush" Color="{StaticResource ThemeBorderGlass}"/>
+            <SolidColorBrush x:Key="ThemeAccentPrimaryBrush" Color="{StaticResource ThemeAccentPrimary}"/>
+            <SolidColorBrush x:Key="ThemeAccentSecondaryBrush" Color="{StaticResource ThemeAccentSecondary}"/>
+            <SolidColorBrush x:Key="ThemeDataFRBrush" Color="{StaticResource ThemeDataFR}"/>
+            <SolidColorBrush x:Key="ThemeDataPriceBrush" Color="{StaticResource ThemeDataPrice}"/>
+            <SolidColorBrush x:Key="ThemeDataDotBrush" Color="{StaticResource ThemeDataDot}"/>
+            <SolidColorBrush x:Key="ThemeBgAlertRowBorderBrush" Color="{StaticResource ThemeBgAlertRowBorder}"/>
+            <SolidColorBrush x:Key="ThemeAccentRedBrush" Color="{StaticResource ThemeAccentRed}"/>
+            <SolidColorBrush x:Key="ThemeDangerBrush" Color="{StaticResource ThemeAccentRed}"/>
+            <SolidColorBrush x:Key="ThemeAccentGreenBrush" Color="{StaticResource ThemeAccentGreen}"/>
+            <SolidColorBrush x:Key="ThemeBgItemHoverBrush" Color="{StaticResource ThemeBgItemHoverColor}"/>
+            <SolidColorBrush x:Key="ThemeBgItemSelectedBrush" Color="{StaticResource ThemeBgItemSelectedColor}"/>
+
+            <Color x:Key="ThemeHeaderTextColor">#1E293B</Color>
+            <Color x:Key="ThemeHeaderButtonColor">#64748B</Color>
+            <SolidColorBrush x:Key="ThemeHeaderTextBrush" Color="{StaticResource ThemeHeaderTextColor}"/>
+            <SolidColorBrush x:Key="ThemeHeaderButtonBrush" Color="{StaticResource ThemeHeaderButtonColor}"/>
+
+            <!-- System selection colors -->
+            <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="{StaticResource ThemeBgItemSelectedColor}"/>
+            <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="{StaticResource ThemeTextPrimary}"/>
+            <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="{StaticResource ThemeBgItemHoverColor}"/>
+            <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}" Color="{StaticResource ThemeTextPrimary}"/>
+            <SolidColorBrush x:Key="{x:Static SystemColors.WindowBrushKey}" Color="{StaticResource ThemeBgCardColor}"/>
+            <SolidColorBrush x:Key="{x:Static SystemColors.WindowTextBrushKey}" Color="{StaticResource ThemeTextPrimary}"/>
+
+            <!-- ComboBox appearance -->
+            <ControlTemplate x:Key="ComboBoxToggleButton" TargetType="ToggleButton">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition Width="20"/>
+                    </Grid.ColumnDefinitions>
+                    <Border x:Name="Border" Grid.ColumnSpan="2" CornerRadius="8"
+                            Background="{StaticResource ThemeBgInput}"
+                            BorderBrush="{StaticResource ThemeBorderGlassBrush}" BorderThickness="1"/>
+                    <Border Grid.Column="0" CornerRadius="8,0,0,8" Margin="1"
+                            Background="{StaticResource ThemeBgInput}"/>
+                    <Path x:Name="Arrow" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"
+                          Data="M 0 0 L 4 4 L 8 0 Z" Fill="{StaticResource ThemeTextMutedBrush}"/>
+                </Grid>
+                <ControlTemplate.Triggers>
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter TargetName="Border" Property="Background" Value="{StaticResource ThemeBgItemHoverBrush}"/>
+                    </Trigger>
+                </ControlTemplate.Triggers>
+            </ControlTemplate>
+
+            <Style TargetType="ComboBox">
+                <Setter Property="Foreground" Value="{StaticResource ThemeTextPrimaryBrush}"/>
+                <Setter Property="SnapsToDevicePixels" Value="True"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="ComboBox">
+                            <Grid>
+                                <ToggleButton x:Name="ToggleButton" Template="{StaticResource ComboBoxToggleButton}"
+                                              Focusable="False" ClickMode="Press"
+                                              IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"/>
+                                <ContentPresenter x:Name="ContentSite" IsHitTestVisible="False"
+                                                  Content="{TemplateBinding SelectionBoxItem}"
+                                                  ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                                  ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
+                                                  Margin="6,3,23,3" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                                <Popup x:Name="Popup" Placement="Bottom" IsOpen="{TemplateBinding IsDropDownOpen}"
+                                       AllowsTransparency="True" Focusable="False" PopupAnimation="Slide">
+                                    <Grid x:Name="DropDown" SnapsToDevicePixels="True"
+                                          MinWidth="{TemplateBinding ActualWidth}" MaxHeight="{TemplateBinding MaxDropDownHeight}">
+                                        <Border x:Name="DropDownBorder" CornerRadius="3"
+                                                Background="{StaticResource ThemeBgCard}"
+                                                BorderBrush="{StaticResource ThemeBorderGlassBrush}" BorderThickness="1"/>
+                                        <ScrollViewer Margin="2" SnapsToDevicePixels="True">
+                                            <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Contained"/>
+                                        </ScrollViewer>
+                                    </Grid>
+                                </Popup>
+                            </Grid>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style TargetType="ComboBoxItem">
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="Foreground" Value="{StaticResource ThemeTextPrimaryBrush}"/>
+                <Setter Property="Padding" Value="8,6"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="ComboBoxItem">
+                            <Border x:Name="Bd" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
+                                <ContentPresenter/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Bd" Property="Background" Value="{StaticResource ThemeBgItemHoverBrush}"/>
+                                </Trigger>
+                                <Trigger Property="IsSelected" Value="True">
+                                    <Setter TargetName="Bd" Property="Background" Value="{StaticResource ThemeBgItemSelectedBrush}"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

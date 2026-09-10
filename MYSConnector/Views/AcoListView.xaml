@@ -1,0 +1,407 @@
+<UserControl x:Class="MYSConnector.Views.AcoListView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="700" d:DesignWidth="1000">
+
+    <UserControl.Resources>
+        <Style x:Key="FieldLabel" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource ThemeTextMutedBrush}"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Margin" Value="0,0,0,4"/>
+        </Style>
+        <Style x:Key="FieldInput" TargetType="TextBox">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="Foreground" Value="{DynamicResource ThemeTextPrimaryBrush}"/>
+            <Setter Property="CaretBrush" Value="{DynamicResource ThemeAccentPrimaryBrush}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border x:Name="FieldBorder" Background="{DynamicResource ThemeBgInput}" CornerRadius="8"
+                                BorderBrush="{DynamicResource ThemeBorderGlassBrush}" BorderThickness="1">
+                            <ScrollViewer x:Name="PART_ContentHost" Margin="10,0" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="FieldBorder" Property="BorderBrush" Value="{DynamicResource ThemeAccentPrimaryBrush}"/>
+                                <Setter TargetName="FieldBorder" Property="BorderThickness" Value="2"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="FieldDate" TargetType="DatePicker">
+            <Setter Property="Background" Value="{DynamicResource ThemeBgInput}"/>
+            <Setter Property="Foreground" Value="{DynamicResource ThemeTextPrimaryBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderGlassBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Style.Triggers>
+                <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                    <Setter Property="BorderBrush" Value="{DynamicResource ThemeAccentPrimaryBrush}"/>
+                    <Setter Property="BorderThickness" Value="2"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style TargetType="DatePickerTextBox">
+            <Setter Property="Padding" Value="8,0"/>
+            <Setter Property="VerticalAlignment" Value="Stretch"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="DatePickerTextBox">
+                        <ScrollViewer x:Name="PART_ContentHost" 
+                                      VerticalAlignment="Center" 
+                                      HorizontalScrollBarVisibility="Hidden" 
+                                      VerticalScrollBarVisibility="Hidden"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Storyboard x:Key="PulseDot1" RepeatBehavior="Forever">
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="Dot1" Storyboard.TargetProperty="Opacity">
+                <EasingDoubleKeyFrame KeyTime="0:0:0.0" Value="0.3"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:0.3" Value="1.0"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:0.6" Value="0.3"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:1.2" Value="0.3"/>
+            </DoubleAnimationUsingKeyFrames>
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="Dot1" Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)">
+                <EasingDoubleKeyFrame KeyTime="0:0:0.0" Value="0.6"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:0.3" Value="1.2"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:0.6" Value="0.6"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:1.2" Value="0.6"/>
+            </DoubleAnimationUsingKeyFrames>
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="Dot1" Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)">
+                <EasingDoubleKeyFrame KeyTime="0:0:0.0" Value="0.6"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:0.3" Value="1.2"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:0.6" Value="0.6"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:1.2" Value="0.6"/>
+            </DoubleAnimationUsingKeyFrames>
+        </Storyboard>
+        <Storyboard x:Key="PulseDot2" RepeatBehavior="Forever">
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="Dot2" Storyboard.TargetProperty="Opacity">
+                <EasingDoubleKeyFrame KeyTime="0:0:0.0" Value="0.3"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:0.2" Value="0.3"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:0.5" Value="1.0"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:0.8" Value="0.3"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:1.2" Value="0.3"/>
+            </DoubleAnimationUsingKeyFrames>
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="Dot2" Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)">
+                <EasingDoubleKeyFrame KeyTime="0:0:0.0" Value="0.6"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:0.2" Value="0.6"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:0.5" Value="1.2"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:0.8" Value="0.6"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:1.2" Value="0.6"/>
+            </DoubleAnimationUsingKeyFrames>
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="Dot2" Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)">
+                <EasingDoubleKeyFrame KeyTime="0:0:0.0" Value="0.6"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:0.2" Value="0.6"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:0.5" Value="1.2"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:0.8" Value="0.6"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:1.2" Value="0.6"/>
+            </DoubleAnimationUsingKeyFrames>
+        </Storyboard>
+        <Storyboard x:Key="PulseDot3" RepeatBehavior="Forever">
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="Dot3" Storyboard.TargetProperty="Opacity">
+                <EasingDoubleKeyFrame KeyTime="0:0:0.0" Value="0.3"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:0.4" Value="0.3"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:0.7" Value="1.0"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:1.0" Value="0.3"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:1.2" Value="0.3"/>
+            </DoubleAnimationUsingKeyFrames>
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="Dot3" Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)">
+                <EasingDoubleKeyFrame KeyTime="0:0:0.0" Value="0.6"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:0.4" Value="0.6"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:0.7" Value="1.2"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:1.0" Value="0.6"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:1.2" Value="0.6"/>
+            </DoubleAnimationUsingKeyFrames>
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="Dot3" Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)">
+                <EasingDoubleKeyFrame KeyTime="0:0:0.0" Value="0.6"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:0.4" Value="0.6"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:0.7" Value="1.2"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:1.0" Value="0.6"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:1.2" Value="0.6"/>
+            </DoubleAnimationUsingKeyFrames>
+        </Storyboard>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="280"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- LEFT: Search -->
+        <Border Grid.Column="0" Background="{DynamicResource ThemeBgCard}" 
+                BorderBrush="{DynamicResource ThemeBorderGlassBrush}" BorderThickness="0,0,1,0">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel Margin="16">
+                    <TextBlock Text="ACO SEARCH" Foreground="{DynamicResource ThemeAccentSecondaryBrush}" 
+                               FontSize="14" FontWeight="Bold" Margin="0,0,0,16"/>
+                    <TextBlock x:Name="ServiceStatusText" Text="SERVICE STATUS: READY"
+                               Foreground="{DynamicResource ThemeTextMutedBrush}" FontSize="10" Margin="0,-10,0,14"/>
+
+                    <TextBlock Text="Start Time" Style="{StaticResource FieldLabel}"/>
+                    <Grid Height="32" Margin="0,0,0,12">
+                        <DatePicker x:Name="SearchStartDate" Style="{StaticResource FieldDate}"
+                                    SelectedDateChanged="SearchStartDate_SelectedDateChanged"/>
+                        <Border Width="31" HorizontalAlignment="Right" IsHitTestVisible="False"
+                                Background="{DynamicResource ThemeBgInput}" CornerRadius="0,8,8,0"
+                                BorderBrush="{DynamicResource ThemeBorderGlassBrush}" BorderThickness="1,0,0,0">
+                            <Path Width="14" Height="14" Stretch="Uniform" StrokeThickness="1.4"
+                                  Stroke="{DynamicResource ThemeTextMutedBrush}"
+                                  Data="M2,3 L14,3 L14,14 L2,14 Z M2,6 L14,6 M5,1 L5,4 M11,1 L11,4"/>
+                        </Border>
+                    </Grid>
+
+                    <TextBlock Text="End Time" Style="{StaticResource FieldLabel}"/>
+                    <Grid Height="32" Margin="0,0,0,20">
+                        <DatePicker x:Name="SearchEndDate" Style="{StaticResource FieldDate}"
+                                    SelectedDateChanged="SearchEndDate_SelectedDateChanged"/>
+                        <Border Width="31" HorizontalAlignment="Right" IsHitTestVisible="False"
+                                Background="{DynamicResource ThemeBgInput}" CornerRadius="0,8,8,0"
+                                BorderBrush="{DynamicResource ThemeBorderGlassBrush}" BorderThickness="1,0,0,0">
+                            <Path Width="14" Height="14" Stretch="Uniform" StrokeThickness="1.4"
+                                  Stroke="{DynamicResource ThemeTextMutedBrush}"
+                                  Data="M2,3 L14,3 L14,14 L2,14 Z M2,6 L14,6 M5,1 L5,4 M11,1 L11,4"/>
+                        </Border>
+                    </Grid>
+
+                    <TextBlock x:Name="DateValidationError" Text="Start Time and End Time are required."
+                               Foreground="{DynamicResource ThemeAccentRedBrush}" FontSize="10"
+                               TextWrapping="Wrap" Margin="0,-10,0,10" Visibility="Collapsed"/>
+
+                    <Button Height="40" Cursor="Hand" Click="Search_Click">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border x:Name="bd" CornerRadius="10" Cursor="Hand">
+                                    <Border.Background>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                            <GradientStop Color="{DynamicResource ThemeAccentPrimary}" Offset="0"/>
+                                            <GradientStop Color="{DynamicResource ThemeAccentSecondary}" Offset="1"/>
+                                        </LinearGradientBrush>
+                                    </Border.Background>
+                                    <TextBlock Text="SEARCH" FontSize="14" FontWeight="Bold" 
+                                               Foreground="{DynamicResource ThemeBgDeep}"
+                                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="bd" Property="Opacity" Value="0.85"/>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+
+                    <Button Height="32" Cursor="Hand" Margin="0,8,0,0" Click="Clear_Click">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border x:Name="bd" CornerRadius="10" Background="{DynamicResource ThemeBgInput}"
+                                        BorderBrush="{DynamicResource ThemeBorderGlassBrush}" BorderThickness="1">
+                                    <TextBlock Text="CLEAR FILTERS" FontSize="11" 
+                                               Foreground="{DynamicResource ThemeTextMutedBrush}"
+                                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="bd" Property="Background" Value="{DynamicResource ThemeBgItemHoverBrush}"/>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+
+                    <TextBlock x:Name="ResultCount" Text="" Foreground="{DynamicResource ThemeTextMutedBrush}" 
+                               FontSize="11" Margin="0,14,0,0" HorizontalAlignment="Center"/>
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+
+        <!-- RIGHT -->
+        <Grid Grid.Column="1">
+            <DataGrid Background="Transparent" BorderThickness="0" Margin="10,8,10,10"
+                      Foreground="{DynamicResource ThemeTextPrimaryBrush}"
+                      RowBackground="Transparent"
+                      AlternatingRowBackground="{DynamicResource ThemeBgInput}"
+                      ColumnHeaderHeight="36" RowHeight="38"
+                      GridLinesVisibility="Horizontal" 
+                      HorizontalGridLinesBrush="{DynamicResource ThemeBorderGlassBrush}"
+                      AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True" 
+                      x:Name="AcoDataGrid"
+                      SelectionChanged="AcoDataGrid_SelectionChanged"
+                      HeadersVisibility="Column" SelectionMode="Single"
+                      VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Auto">
+                
+                <DataGrid.Resources>
+                    <Style TargetType="DataGridColumnHeader">
+                        <Setter Property="Background" Value="Transparent"/>
+                        <Setter Property="Foreground" Value="{DynamicResource ThemeTextMutedBrush}"/>
+                        <Setter Property="FontWeight" Value="Bold"/>
+                        <Setter Property="FontSize" Value="11"/>
+                        <Setter Property="Padding" Value="10,0"/>
+                        <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                        <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderGlassBrush}"/>
+                    </Style>
+                    <Style TargetType="DataGridCell">
+                        <Setter Property="BorderThickness" Value="0"/>
+                        <Setter Property="Padding" Value="10,0"/>
+                        <Setter Property="Foreground" Value="{DynamicResource ThemeTextPrimaryBrush}"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="DataGridCell">
+                                    <Border Padding="{TemplateBinding Padding}" Background="Transparent">
+                                        <ContentPresenter VerticalAlignment="Center"/>
+                                    </Border>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                    <Style TargetType="DataGridRow">
+                        <Setter Property="Background" Value="Transparent"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="DataGridRow">
+                                    <Border x:Name="RowBorder" Background="{TemplateBinding Background}" 
+                                            BorderThickness="3,0,0,0" CornerRadius="6" BorderBrush="Transparent"
+                                            SnapsToDevicePixels="True">
+                                        <SelectiveScrollingGrid>
+                                            <SelectiveScrollingGrid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </SelectiveScrollingGrid.ColumnDefinitions>
+                                            <SelectiveScrollingGrid.RowDefinitions>
+                                                <RowDefinition Height="*"/>
+                                                <RowDefinition Height="Auto"/>
+                                            </SelectiveScrollingGrid.RowDefinitions>
+                                            <DataGridCellsPresenter Grid.Column="1" 
+                                                ItemsPanel="{TemplateBinding ItemsPanel}"
+                                                SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                                            <DataGridDetailsPresenter Grid.Column="1" Grid.Row="1"
+                                                Visibility="{TemplateBinding DetailsVisibility}"
+                                                SelectiveScrollingGrid.SelectiveScrollingOrientation="{Binding 
+                                                    AreRowDetailsFrozen, ConverterParameter={x:Static SelectiveScrollingOrientation.Vertical},
+                                                    Converter={x:Static DataGrid.RowDetailsScrollingConverter}, 
+                                                    RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}"/>
+                                            <DataGridRowHeader Grid.RowSpan="2" 
+                                                SelectiveScrollingGrid.SelectiveScrollingOrientation="Vertical"
+                                                Visibility="{Binding HeadersVisibility, ConverterParameter={x:Static DataGridHeadersVisibility.Row},
+                                                    Converter={x:Static DataGrid.HeadersVisibilityConverter},
+                                                    RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}"/>
+                                        </SelectiveScrollingGrid>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="RowBorder" Property="Background" Value="{DynamicResource ThemeBgItemHoverBrush}"/>
+                                            <Setter TargetName="RowBorder" Property="BorderBrush" Value="{DynamicResource ThemeAccentPrimaryBrush}"/>
+                                        </Trigger>
+                                        <Trigger Property="IsSelected" Value="True">
+                                            <Setter TargetName="RowBorder" Property="Background" Value="{DynamicResource ThemeBgItemSelectedBrush}"/>
+                                            <Setter TargetName="RowBorder" Property="BorderBrush" Value="{DynamicResource ThemeAccentSecondaryBrush}"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </DataGrid.Resources>
+
+                <DataGrid.Columns>
+                    <DataGridTemplateColumn Header="" Width="75">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Content="{Binding ParseButtonText}" Tag="{Binding}" Click="ParseRow_Click" Cursor="Hand">
+                                    <Button.Template>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border x:Name="bd" CornerRadius="8" Padding="6,3"
+                                                    Background="{DynamicResource ThemeBgInput}"
+                                                    BorderBrush="{DynamicResource ThemeAccentPrimaryBrush}" BorderThickness="1">
+                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="bd" Property="Background" Value="{DynamicResource ThemeAccentPrimaryBrush}"/>
+                                                </Trigger>
+                                                <DataTrigger Binding="{Binding ParseButtonText}" Value="Done">
+                                                    <Setter TargetName="bd" Property="Background" Value="#2EAD68"/>
+                                                    <Setter TargetName="bd" Property="BorderBrush" Value="#55E89A"/>
+                                                    <Setter Property="Foreground" Value="White"/>
+                                                </DataTrigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Button.Template>
+                                </Button>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn Header="MSG ID" Binding="{Binding MsgId}" Width="120"/>
+                    <DataGridTextColumn Header="START TIME" Binding="{Binding ValidFrom}" Width="130"/>
+                    <DataGridTextColumn Header="END TIME" Binding="{Binding ValidTo}" Width="130"/>
+                    <DataGridTextColumn Header="AREA NAME" Binding="{Binding AreaName}" Width="*"/>
+                    <DataGridTextColumn Header="TYPE" Binding="{Binding AcoType}" Width="70"/>
+                    <DataGridTextColumn Header="CONTROL" Binding="{Binding ControlAuth}" Width="100"/>
+                </DataGrid.Columns>
+            </DataGrid>
+
+            <Border x:Name="EmptyStatePanel" Visibility="Collapsed" HorizontalAlignment="Center"
+                    VerticalAlignment="Center" Background="{DynamicResource ThemeBgCard}"
+                    BorderBrush="{DynamicResource ThemeBorderGlassBrush}" BorderThickness="1"
+                    CornerRadius="12" Padding="32,24" IsHitTestVisible="False">
+                <StackPanel HorizontalAlignment="Center">
+                    <TextBlock Text="NO MESSAGES FOUND" Foreground="{DynamicResource ThemeTextPrimaryBrush}"
+                               FontSize="15" FontWeight="Bold" HorizontalAlignment="Center"/>
+                    <TextBlock x:Name="EmptyStateRangeText" Text="Date range: —" Margin="0,8,0,0"
+                               Foreground="{DynamicResource ThemeTextMutedBrush}" FontSize="11"
+                               HorizontalAlignment="Center"/>
+                    <TextBlock x:Name="EmptyStateFilterText" Text="Filters: none" Margin="0,4,0,0"
+                               Foreground="{DynamicResource ThemeTextMutedBrush}" FontSize="11"
+                               HorizontalAlignment="Center" TextWrapping="Wrap"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Preloader Overlay -->
+            <Border x:Name="SearchOverlay" Visibility="Collapsed">
+                <Border.Background>
+                    <SolidColorBrush Color="#000000" Opacity="0.65"/>
+                </Border.Background>
+                <Border HorizontalAlignment="Center" VerticalAlignment="Center" CornerRadius="16" Padding="36,28" Width="220">
+                    <Border.Background>
+                        <SolidColorBrush Color="{DynamicResource ThemeBgCardColor}" Opacity="0.95"/>
+                    </Border.Background>
+                    <Border.Effect>
+                        <DropShadowEffect BlurRadius="30" ShadowDepth="0" Opacity="0.4" Color="{DynamicResource ThemeAccentPrimary}"/>
+                    </Border.Effect>
+                    <StackPanel HorizontalAlignment="Center">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,16">
+                            <Ellipse x:Name="Dot1" Width="12" Height="12" Margin="4,0" Opacity="0.3" RenderTransformOrigin="0.5,0.5">
+                                <Ellipse.Fill><SolidColorBrush Color="{DynamicResource ThemeAccentPrimary}"/></Ellipse.Fill>
+                                <Ellipse.RenderTransform><ScaleTransform ScaleX="0.6" ScaleY="0.6"/></Ellipse.RenderTransform>
+                            </Ellipse>
+                            <Ellipse x:Name="Dot2" Width="12" Height="12" Margin="4,0" Opacity="0.3" RenderTransformOrigin="0.5,0.5">
+                                <Ellipse.Fill><SolidColorBrush Color="{DynamicResource ThemeAccentSecondary}"/></Ellipse.Fill>
+                                <Ellipse.RenderTransform><ScaleTransform ScaleX="0.6" ScaleY="0.6"/></Ellipse.RenderTransform>
+                            </Ellipse>
+                            <Ellipse x:Name="Dot3" Width="12" Height="12" Margin="4,0" Opacity="0.3" RenderTransformOrigin="0.5,0.5">
+                                <Ellipse.Fill><SolidColorBrush Color="{DynamicResource ThemeAccentPrimary}"/></Ellipse.Fill>
+                                <Ellipse.RenderTransform><ScaleTransform ScaleX="0.6" ScaleY="0.6"/></Ellipse.RenderTransform>
+                            </Ellipse>
+                        </StackPanel>
+                        <TextBlock x:Name="LoadingText" Text="Searching..." 
+                                   Foreground="{DynamicResource ThemeTextPrimaryBrush}" 
+                                   FontSize="13" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                    </StackPanel>
+                </Border>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

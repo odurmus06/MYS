@@ -901,3 +901,498 @@ Searching... / Parsing...
 6. Solution'ı yeniden derleyin.
 
 ---
+
+## Değişiklik 005 — Zorunlu tarih alanlarında kırmızı kenarlık
+
+**Tarih:** 9 Ekim 2026  
+**Hedef proje:** `MYSClient` / WPF / .NET Framework 4.5  
+**Etkilenen dosyalar:** `Views/AtoListView.xaml`, `Views/AtoListView.xaml.cs`, `Views/AcoListView.xaml`, `Views/AcoListView.xaml.cs`
+
+### Amaç
+
+SEARCH sırasında Start Time veya End Time boşsa mevcut kırmızı required mesajıyla birlikte yalnızca boş olan DatePicker'ın çevresini kırmızı göstermek. Tarih seçildikçe ilgili çerçeve ve mesaj güncellenir. CLEAR FILTERS veya logout sonrasında eski hata görünmez.
+
+### 1. ATO ve ACO XAML dosyalarına kırmızı çerçeveleri ekleyin
+
+Önce `Views/AtoListView.xaml` dosyasını açın. `SearchStartDate` içeren `<Grid Height="32" ...>` bloğunda, takvim simgesini taşıyan `</Border>` ile grid'in `</Grid>` satırı arasına şu Border'ı ekleyin:
+
+```xml
+<Border x:Name="StartDateRequiredBorder"
+        BorderBrush="{DynamicResource ThemeAccentRedBrush}"
+        BorderThickness="2" CornerRadius="8"
+        IsHitTestVisible="False" Visibility="Collapsed"/>
+```
+
+Start Time grid'inin son kısmı şöyle olmalıdır:
+
+```xml
+<DatePicker x:Name="SearchStartDate" Style="{StaticResource FieldDate}"
+            SelectedDateChanged="SearchStartDate_SelectedDateChanged"/>
+<Border Width="31" HorizontalAlignment="Right" IsHitTestVisible="False" ...>
+    <!-- Mevcut takvim simgesi kodu aynen kalır. -->
+</Border>
+<Border x:Name="StartDateRequiredBorder"
+        BorderBrush="{DynamicResource ThemeAccentRedBrush}"
+        BorderThickness="2" CornerRadius="8"
+        IsHitTestVisible="False" Visibility="Collapsed"/>
+```
+
+Buradaki `...` ve açıklama yalnızca konumu tarif eder; mevcut takvim Border'ını değiştirmeyin.
+
+Aynı dosyada `SearchEndDate` içeren grid'in takvim simgesi Border'ından sonra, `</Grid>` öncesine şunu ekleyin:
+
+```xml
+<Border x:Name="EndDateRequiredBorder"
+        BorderBrush="{DynamicResource ThemeAccentRedBrush}"
+        BorderThickness="2" CornerRadius="8"
+        IsHitTestVisible="False" Visibility="Collapsed"/>
+```
+
+Bu iki eklemeyi `Views/AcoListView.xaml` dosyasındaki Start Time ve End Time grid'lerine de aynı sırayla uygulayın. ATO'daki `Min Publish Date` alanına çerçeve eklemeyin; bu filtre isteğe bağlıdır.
+
+Çerçeve ilgili grid'in en son çocuğu olmalıdır; böylece DatePicker ve takvim simgesinin üzerinde görünür. `IsHitTestVisible="False"` sayesinde tıklamaları engellemez.
+
+### 2. Her iki code-behind dosyasında Search_Click kontrolünü değiştirin
+
+`Views/AtoListView.xaml.cs` ve `Views/AcoListView.xaml.cs` dosyalarındaki `Search_Click` metodunda şu eski bloğu bulun:
+
+```csharp
+if (!SearchStartDate.SelectedDate.HasValue || !SearchEndDate.SelectedDate.HasValue)
+{
+    DateValidationError.Text = "Start Time and End Time are required.";
+    DateValidationError.Visibility = Visibility.Visible;
+    return;
+}
+DateValidationError.Visibility = Visibility.Collapsed;
+```
+
+Her iki dosyada da bloğun tamamını şununla değiştirin:
+
+```csharp
+if (!ValidateRequiredDates())
+    return;
+```
+
+### 3. Her iki code-behind dosyasına doğrulama metodunu ekleyin
+
+İki dosyada da `SearchEndDate_SelectedDateChanged` metodunun hemen altına şu metodu ekleyin:
+
+```csharp
+private bool ValidateRequiredDates()
+{
+    bool missingStart = !SearchStartDate.SelectedDate.HasValue;
+    bool missingEnd = !SearchEndDate.SelectedDate.HasValue;
+
+    StartDateRequiredBorder.Visibility = missingStart ? Visibility.Visible : Visibility.Collapsed;
+    EndDateRequiredBorder.Visibility = missingEnd ? Visibility.Visible : Visibility.Collapsed;
+    DateValidationError.Text = missingStart && missingEnd
+        ? "Start Time and End Time are required."
+        : missingStart ? "Start Time is required." : "End Time is required.";
+    DateValidationError.Visibility = missingStart || missingEnd
+        ? Visibility.Visible : Visibility.Collapsed;
+    return !missingStart && !missingEnd;
+}
+```
+
+### 4. Tarih seçildiğinde kırmızı durumu güncelleyin
+
+Her iki dosyada `SearchStartDate_SelectedDateChanged` metodunda, geçersiz eski End Time'ı temizleyen `if` bloğunun hemen sonuna ve metodun kapanış `}` satırından önce şunu ekleyin:
+
+```csharp
+if (DateValidationError.Visibility == Visibility.Visible)
+    ValidateRequiredDates();
+```
+
+Her iki dosyada `SearchEndDate_SelectedDateChanged` metodunda şu satırı bulun:
+
+```csharp
+SearchStartDate.DisplayDateEnd = SearchEndDate.SelectedDate;
+```
+
+Hemen altına aynı iki satırı ekleyin:
+
+```csharp
+if (DateValidationError.Visibility == Visibility.Visible)
+    ValidateRequiredDates();
+```
+
+Bu kontrol ilk açılışta hata göstermeyi önler; required uyarısı yalnızca SEARCH denemesinden sonra görünür.
+
+### 5. Clear ve logout sonrası çerçeveleri kapatın
+
+Her iki dosyadaki `ResetFilters` metodunda şu satırı bulun:
+
+```csharp
+DateValidationError.Visibility = Visibility.Collapsed;
+```
+
+Hemen altına şunları ekleyin:
+
+```csharp
+StartDateRequiredBorder.Visibility = Visibility.Collapsed;
+EndDateRequiredBorder.Visibility = Visibility.Collapsed;
+```
+
+`CLEAR FILTERS` ve logout aynı `ResetFilters` metodunu kullandığından iki durumda da hata sıfırlanır.
+
+### 6. Derleme ve manuel kontrol
+
+1. Visual Studio'da `MYSClient` projesini Debug ve Release olarak yeniden derleyin.
+2. ATO ekranında iki tarihi boş bırakıp SEARCH'e basın. Her iki DatePicker kırmızı olmalı, required mesajı görünmeli ve arama başlamamalı.
+3. Yalnızca Start Time seçin. Start kırmızısı kalkmalı; End kırmızı ve mesaj `End Time is required.` olmalı.
+4. End Time'ı da seçin. İki kırmızı çerçeve ve required mesajı kaybolmalı.
+5. Tarihleri temizleyip yalnızca End Time seçerek SEARCH'e basın. Yalnızca Start kırmızı olmalı.
+6. CLEAR FILTERS'e basın. Hatalar kapalı kalmalı; tarihler boş olsa bile SEARCH'e yeniden basılmadan görünmemeli.
+7. Aynı senaryoları ACO ekranında tekrarlayın.
+8. Logout ve tekrar login sonrasında eski kırmızı uyarıların görünmediğini doğrulayın.
+
+### 7. Geri alma
+
+1. İki XAML dosyasındaki `StartDateRequiredBorder` ve `EndDateRequiredBorder` elemanlarını kaldırın.
+2. İki code-behind dosyasındaki `ValidateRequiredDates` metodunu kaldırın.
+3. `Search_Click` içinde eski required kontrolünü geri koyun.
+4. Tarih değişim handler'ları ve `ResetFilters` içine eklenen görünürlük satırlarını kaldırın.
+5. Projeyi yeniden derleyin.
+
+---
+
+## Değişiklik 006 — Bottom panel servis durumunu iki renkte gösterme
+
+**Tarih:** 9 Ekim 2026  
+**Hedef proje:** `MYSClient` / WPF / .NET Framework 4.5  
+**Etkilenen dosyalar:** `MainWindow.xaml`, `MainWindow.xaml.cs`
+
+### Amaç
+
+Bottom panelde `SERVICE STATUS:` etiketi siyah kalır. Yanındaki durum değeri `READY` ve `BUSY` için yeşil, `ERROR` için kırmızı görünür. Etiket ve değer farklı `TextBlock` elemanları olduğu için renkler birbirinden bağımsızdır.
+
+### 1. MainWindow.xaml içinde etiketi ve değeri ayırın
+
+`MainWindow.xaml` dosyasında `<!-- Bottom status panel -->` başlığının altındaki şu elemanı bulun:
+
+```xml
+<TextBlock x:Name="BottomServiceStatusText" Text="SERVICE STATUS: READY"
+           Foreground="{DynamicResource ThemeAccentGreenBrush}" FontSize="10"
+           FontWeight="SemiBold" VerticalAlignment="Center"/>
+```
+
+Üç satırın tamamını aşağıdaki blokla değiştirin:
+
+```xml
+<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+    <TextBlock Text="SERVICE STATUS:" Foreground="Black" FontSize="10"
+               FontWeight="SemiBold" VerticalAlignment="Center" Margin="0,0,4,0"/>
+    <TextBlock x:Name="BottomServiceStatusText" Text="READY"
+               Foreground="{DynamicResource ThemeAccentGreenBrush}" FontSize="10"
+               FontWeight="SemiBold" VerticalAlignment="Center"/>
+</StackPanel>
+```
+
+Bu blok bottom paneldeki `<Grid>` içinde, `BottomContextText` elemanından önce kalmalıdır. `x:Name="BottomServiceStatusText"` yalnızca renk değiştiren ikinci `TextBlock` üzerinde bulunmalıdır.
+
+### 2. MainWindow.xaml.cs içindeki durum güncellemesini değiştirin
+
+`UpdateBottomStatus` metodunda şu kodu bulun:
+
+```csharp
+BottomServiceStatusText.Text = "SERVICE STATUS: " + serviceStatus;
+BottomServiceStatusText.Foreground = (System.Windows.Media.Brush)FindResource(
+    serviceStatus == "ERROR" ? "ThemeAccentRedBrush" :
+    serviceStatus == "BUSY" ? "ThemeAccentPrimaryBrush" : "ThemeAccentGreenBrush");
+```
+
+Bu kodu aşağıdakiyle değiştirin:
+
+```csharp
+BottomServiceStatusText.Text = serviceStatus;
+BottomServiceStatusText.Foreground = (System.Windows.Media.Brush)FindResource(
+    serviceStatus == "ERROR" ? "ThemeAccentRedBrush" : "ThemeAccentGreenBrush");
+```
+
+`SetBottomContext` metodunda şu satırı bulun:
+
+```csharp
+BottomServiceStatusText.Text = "SERVICE STATUS: READY";
+```
+
+Şununla değiştirin:
+
+```csharp
+BottomServiceStatusText.Text = "READY";
+```
+
+`SetBottomContext` metodundaki yeşil `Foreground` satırı aynen kalır. Etiketin `Foreground="Black"` değeri XAML'de sabit olduğu için code-behind tarafından değiştirilmez.
+
+### 3. Derleme ve manuel kontrol
+
+1. Visual Studio'da Debug ve Release yapılandırmalarını yeniden derleyin.
+2. Uygulamayı açıp login olun. `SERVICE STATUS:` siyah, `READY` yeşil olmalıdır.
+3. ATO veya ACO aramasını başlatın. `BUSY` yeşil olmalı; etiket siyah kalmalıdır.
+4. İşlem bitince `READY` yeniden yeşil görünmelidir.
+5. Bir servis hatası oluştuğunda `ERROR` kırmızı olmalı; etiket siyah kalmalıdır.
+6. Settings, ATO ve ACO arasında geçerken etiket renginin değişmediğini doğrulayın.
+
+### 4. Geri alma
+
+1. XAML'deki iki `TextBlock` içeren `StackPanel` yerine eski tek `BottomServiceStatusText` elemanını koyun.
+2. `UpdateBottomStatus` metodunda tam metni (`"SERVICE STATUS: " + serviceStatus`) ve eski üç renkli koşulu geri yükleyin.
+3. `SetBottomContext` içindeki metni `"SERVICE STATUS: READY"` yapın.
+4. Projeyi yeniden derleyin.
+
+---
+
+## Değişiklik 007 — ATO/ACO menü ikonları ve pencere başlığı
+
+**Tarih:** 9 Ekim 2026  
+**Hedef proje:** `MYSClient` / WPF / .NET Framework 4.5  
+**Etkilenen dosya:** `MainWindow.xaml`
+
+### Amaç
+
+Sol menüde ATO için uçak, ACO için saha/alan simgesi göstermek. Windows başlık çubuğunda uygulama adını `MYSClient` olarak yazmak. Menü ikonları mevcut aktif menü rengine bağlı kalır.
+
+### 1. Pencere başlığını yazın
+
+`MainWindow.xaml` dosyasının en üstündeki `<Window>` açılışında şu satırı bulun:
+
+```xml
+Title="" Height="768" Width="1280"
+```
+
+Şununla değiştirin:
+
+```xml
+Title="MYSClient" Height="768" Width="1280"
+```
+
+Bu başlık Windows'un normal pencere başlık çubuğunda görünür. İçerideki `PageTitle` metnine dokunmayın.
+
+### 2. ATO ikonunu uçak yapın
+
+Aynı dosyada `x:Name="NavAtoButton"` olan butonun içindeki `<Path>` elemanını bulun. Mevcut `Data` satırı:
+
+```xml
+Data="M4,2 L12,2 L12,4 L15,4 L15,15 L1,15 L1,4 L4,4 Z M5,1 L11,1 L11,3 L5,3 Z M3,7 L13,7 M3,10 L13,10 M3,13 L9,13"/>
+```
+
+Yalnızca bu `Data` satırını şu uçak çizimiyle değiştirin:
+
+```xml
+Data="M8,1 L10,7 L16,9 L16,11 L10,10 L10,15 L13,17 L13,18 L8,16 L3,18 L3,17 L6,15 L6,10 L0,11 L0,9 L6,7 Z"/>
+```
+
+ATO `<Path>` elemanındaki `Width`, `Height`, `Stroke`, `StrokeThickness` ve `Stretch` özelliklerini değiştirmeyin.
+
+### 3. ACO ikonunu saha/alan yapın
+
+`x:Name="NavAcoButton"` olan butonun içindeki `<Path>` elemanını bulun. Önceden uçak olan şu `Data` satırını:
+
+```xml
+Data="M8,1 L10,7 L16,9 L16,11 L10,10 L10,15 L13,17 L13,18 L8,16 L3,18 L3,17 L6,15 L6,10 L0,11 L0,9 L6,7 Z"/>
+```
+
+şu dış sınırı ve iç alanı gösteren çizimle değiştirin:
+
+```xml
+Data="M1,2 L15,2 L15,14 L1,14 Z M4,5 L8,4 L12,7 L11,11 L6,12 L3,9 Z"/>
+```
+
+İki butonun `<Path>` elemanlarındaki mevcut `Stroke` binding'i aynı kalmalıdır:
+
+```xml
+Stroke="{Binding RelativeSource={RelativeSource AncestorType={x:Type Button}}, Path=Foreground}"
+```
+
+Bu binding aktif menünün ikonunu vurgulayan rengi korur.
+
+### 4. Derleme ve kontrol
+
+1. Visual Studio'da `MYSClient` projesini Debug ve Release olarak yeniden derleyin.
+2. Uygulamayı açın. Windows başlık çubuğunda `MYSClient` yazdığını doğrulayın.
+3. Sol menüde ATO'nun uçak, ACO'nun sınırlandırılmış alan simgesi olduğunu doğrulayın.
+4. ATO ve ACO arasında geçin; seçilen sayfanın ikon rengi ve sol seçili göstergesi birlikte değişmelidir.
+5. Login ve logout sonrasında başlık ve ikonların aynı kaldığını doğrulayın.
+
+### 5. Geri alma
+
+1. `Title="MYSClient"` değerini eski `Title=""` değerine döndürün.
+2. ATO ve ACO `Path.Data` değerlerini yukarıdaki eski kodlara geri döndürün.
+3. Projeyi yeniden derleyin.
+
+---
+
+## Değişiklik 008 — Login'de boş alanların kırmızı gösterilmesi
+
+**Tarih:** 9 Ekim 2026  
+**Hedef proje:** `MYSClient` / WPF / .NET Framework 4.5  
+**Etkilenen dosyalar:** `MainWindow.xaml`, `MainWindow.xaml.cs`
+
+### Amaç
+
+SIGN IN'e basıldığında kullanıcı adı veya parola boşsa yalnızca eksik alanın dış çerçevesi kırmızı olur. Mevcut `LoginError` mesajı hangi alanın eksik olduğunu söyler. Alan doldurulunca kırmızı çerçeve kalkar. Logout ve oturum zaman aşımı sonrasında eski required işaretleri temizlenir.
+
+### 1. MainWindow.xaml: giriş alanlarının dış Border elemanlarına isim verin
+
+`USERNAME` etiketinin hemen altındaki, `LoginUsername` TextBox'ını saran Border'ın başlangıcını bulun:
+
+```xml
+<Border Background="{DynamicResource ThemeBgInput}" CornerRadius="8"
+        BorderBrush="{DynamicResource ThemeBorderGlassBrush}" BorderThickness="1" Margin="0,0,0,16">
+```
+
+Başlangıç etiketine `x:Name="LoginUsernameBorder"` ekleyin:
+
+```xml
+<Border x:Name="LoginUsernameBorder" Background="{DynamicResource ThemeBgInput}" CornerRadius="8"
+        BorderBrush="{DynamicResource ThemeBorderGlassBrush}" BorderThickness="1" Margin="0,0,0,16">
+```
+
+İçindeki `LoginUsername` TextBox'ın başlangıç satırında `KeyDown` sonrasına `TextChanged` olayını ekleyin:
+
+```xml
+<TextBox x:Name="LoginUsername" KeyDown="LoginField_KeyDown"
+         TextChanged="LoginUsername_TextChanged"
+         Background="Transparent" BorderThickness="0"
+```
+
+`PASSWORD` etiketinin altındaki, `LoginPassword` PasswordBox'ını saran Border'ın başlangıcını bulun. Buna `x:Name="LoginPasswordBorder"` ekleyin:
+
+```xml
+<Border x:Name="LoginPasswordBorder" Background="{DynamicResource ThemeBgInput}" CornerRadius="8"
+        BorderBrush="{DynamicResource ThemeBorderGlassBrush}" BorderThickness="1" Margin="0,0,0,24">
+```
+
+İçindeki PasswordBox'ın başlangıç satırında `KeyDown` sonrasına `PasswordChanged` olayını ekleyin:
+
+```xml
+<PasswordBox x:Name="LoginPassword" KeyDown="LoginField_KeyDown"
+             PasswordChanged="LoginPassword_PasswordChanged"
+             Background="Transparent" BorderThickness="0"
+```
+
+Diğer TextBox/PasswordBox özellikleri ve kapatma `/>` satırları aynen kalır.
+
+### 2. MainWindow.xaml.cs: Brush namespace'i ve durum alanını ekleyin
+
+Dosyanın üstündeki `using System.Windows.Input;` satırının altına ekleyin:
+
+```csharp
+using System.Windows.Media;
+```
+
+`MainWindow` class'ında `_lastActivity` alanının altına ekleyin:
+
+```csharp
+private bool _loginRequiredValidationShown;
+```
+
+### 3. LoginButton_Click içindeki boş alan kontrolünü değiştirin
+
+`LoginButton_Click` metodunda şu eski bloğu bulun:
+
+```csharp
+string user = LoginUsername.Text != null ? LoginUsername.Text.Trim() : "";
+string pass = LoginPassword.Password != null ? LoginPassword.Password.Trim() : "";
+
+if (string.IsNullOrEmpty(user) || string.IsNullOrEmpty(pass))
+{
+    ShowLoginError("Please enter username and password.");
+    return;
+}
+```
+
+Bloğun tamamını şununla değiştirin:
+
+```csharp
+_loginRequiredValidationShown = true;
+if (!ValidateLoginFields())
+    return;
+```
+
+Metodun başarılı giriş kısmındaki `LoginOverlay.Visibility = Visibility.Collapsed;`, blur kaldırma ve oturum zamanlayıcısı satırlarını değiştirmeyin.
+
+### 4. MainWindow.xaml.cs: olay ve doğrulama metotlarını ekleyin
+
+`LoginField_KeyDown` metodunun hemen altına aşağıdaki dört metodu ekleyin:
+
+```csharp
+private void LoginUsername_TextChanged(object sender, TextChangedEventArgs e)
+{
+    if (_loginRequiredValidationShown)
+        ValidateLoginFields();
+}
+
+private void LoginPassword_PasswordChanged(object sender, RoutedEventArgs e)
+{
+    if (_loginRequiredValidationShown)
+        ValidateLoginFields();
+}
+
+private bool ValidateLoginFields()
+{
+    bool missingUsername = string.IsNullOrWhiteSpace(LoginUsername.Text);
+    bool missingPassword = string.IsNullOrWhiteSpace(LoginPassword.Password);
+    SetLoginRequiredBorders(missingUsername, missingPassword);
+
+    if (missingUsername || missingPassword)
+    {
+        ShowLoginError(missingUsername && missingPassword
+            ? "Please enter username and password."
+            : missingUsername ? "Please enter username." : "Please enter password.");
+        return false;
+    }
+
+    _loginRequiredValidationShown = false;
+    LoginError.Visibility = Visibility.Collapsed;
+    return true;
+}
+
+private void SetLoginRequiredBorders(bool missingUsername, bool missingPassword)
+{
+    Brush errorBrush = (Brush)FindResource("ThemeAccentRedBrush");
+    Brush normalBrush = (Brush)FindResource("ThemeBorderGlassBrush");
+    LoginUsernameBorder.BorderBrush = missingUsername ? errorBrush : normalBrush;
+    LoginUsernameBorder.BorderThickness = new Thickness(missingUsername ? 2 : 1);
+    LoginPasswordBorder.BorderBrush = missingPassword ? errorBrush : normalBrush;
+    LoginPasswordBorder.BorderThickness = new Thickness(missingPassword ? 2 : 1);
+}
+```
+
+`_loginRequiredValidationShown` sayesinde uyarılar uygulama ilk açıldığında görünmez; ilk başarısız SIGN IN denemesinden sonra alan değişiklikleri anlık kontrol edilir.
+
+### 5. Logout_Click içinde eski uyarıyı sıfırlayın
+
+`Logout_Click` metodunda `_acoView.ResetFilters();` satırının hemen altına ekleyin:
+
+```csharp
+_loginRequiredValidationShown = false;
+```
+
+`LoginPassword.Password = "";` satırının hemen altına ekleyin:
+
+```csharp
+SetLoginRequiredBorders(false, false);
+```
+
+Oturum zaman aşımı da `Logout_Click` metodunu kullandığından aynı temizlik otomatik uygulanır.
+
+### 6. Derleme ve manuel kontrol
+
+1. Debug ve Release konfigürasyonlarını yeniden derleyin.
+2. Uygulamayı açın. İlk açılışta giriş alanlarının çerçevesi normal renkte olmalıdır.
+3. İki alanı boş bırakıp SIGN IN'e basın. İkisi kırmızı olmalı; genel required mesajı görünmelidir.
+4. Kullanıcı adını yazın. Kullanıcı adı çerçevesi normale dönmeli; yalnızca parola kırmızı ve mesaj `Please enter password.` olmalıdır.
+5. Parolayı yazın. İki çerçeve normale dönmeli ve required mesajı kaybolmalıdır.
+6. Alanlardan yalnızca birini boş bırakarak SIGN IN'e basın. Yalnızca o alan kırmızı olmalıdır.
+7. Başarılı girişten sonra logout yapın. Yeni login ekranında eski kırmızı çerçeve veya required mesajı görünmemelidir.
+8. Klavyeden Enter ile girişte de aynı doğrulamanın çalıştığını kontrol edin.
+
+### 7. Geri alma
+
+1. XAML'de iki Border `x:Name` değerini ve TextBox/PasswordBox olaylarını kaldırın.
+2. Code-behind'da `using System.Windows.Media;`, `_loginRequiredValidationShown` ve eklenen dört metodu kaldırın.
+3. `LoginButton_Click` içindeki eski boş alan kontrolünü geri yükleyin.
+4. `Logout_Click` içine eklenen iki satırı kaldırın.
+5. Projeyi yeniden derleyin.
+
+---
